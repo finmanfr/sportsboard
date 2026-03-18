@@ -1,0 +1,29 @@
+@font-face {
+  font-family: 'Scoreboard';
+  src: url('scoreboard.ttf');
+}
+
+body {
+  margin: 0;
+  background: black;
+  color: red;
+  font-family: 'Scoreboard', monospace;
+  text-align: center;
+}
+
+.scoreboard {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100vh;
+}
+
+.score {
+  font-size: 6rem;
+  color: orange;
+}
+
+.timer {
+  font-size: 5rem;
+  color: lime;
+}
