@@ -1,31 +1,183 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Scoreboard</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Basketball Scoreboard</title>
+
+<style>
+body {
+  margin: 0;
+  background: #0b2f7a;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+.scoreboard {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: auto auto auto;
+  height: 100vh;
+  text-align: center;
+  align-items: center;
+}
+
+.team {
+  font-size: 60px;
+  font-weight: bold;
+}
+
+.score {
+  font-size: 140px;
+  color: red;
+  font-family: "Courier New", monospace;
+  letter-spacing: 10px;
+}
+
+.timer {
+  font-size: 120px;
+  color: orange;
+  font-family: "Courier New", monospace;
+}
+
+.period {
+  font-size: 60px;
+  color: orange;
+}
+
+.bonus {
+  font-size: 30px;
+}
+
+.center {
+  grid-column: 2;
+}
+
+.left {
+  grid-column: 1;
+}
+
+.right {
+  grid-column: 3;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="scoreboard">
-    <div class="team">
-      <h1>HOME</h1>
-      <div id="scoreA" class="score">0</div>
-      <div>Fouls: <span id="foulsA">0</span></div>
-    </div>
+<div class="scoreboard">
 
-    <div class="center">
-      <div id="timer" class="timer">6:00</div>
-      <div>Quarter: <span id="quarter">1</span></div>
-    </div>
-
-    <div class="team">
-      <h1>GUEST</h1>
-      <div id="scoreB" class="score">0</div>
-      <div>Fouls: <span id="foulsB">0</span></div>
-    </div>
+  <!-- HOME -->
+  <div class="left">
+    <div class="team">HOME</div>
+    <div id="homeScore" class="score">00</div>
+    <div class="bonus">BONUS: <span id="homeBonus">0</span></div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- CENTER -->
+  <div class="center">
+    <div id="timer" class="timer">06:00</div>
+    <div>PERIOD</div>
+    <div id="period" class="period">1</div>
+  </div>
+
+  <!-- GUEST -->
+  <div class="right">
+    <div class="team">GUEST</div>
+    <div id="guestScore" class="score">00</div>
+    <div class="bonus">BONUS: <span id="guestBonus">0</span></div>
+  </div>
+
+</div>
+
+<script>
+// STATE
+let home = 0;
+let guest = 0;
+let homeBonus = 0;
+let guestBonus = 0;
+
+let period = 1;
+let time = 360; // 6 minutes (in seconds)
+let running = false;
+
+// DISPLAY UPDATE
+function updateDisplay() {
+  document.getElementById("homeScore").textContent = String(home).padStart(2, "0");
+  document.getElementById("guestScore").textContent = String(guest).padStart(2, "0");
+
+  document.getElementById("homeBonus").textContent = homeBonus;
+  document.getElementById("guestBonus").textContent = guestBonus;
+
+  document.getElementById("period").textContent = period;
+
+  let minutes = Math.floor(time / 60);
+  let seconds = time % 60;
+  document.getElementById("timer").textContent =
+    `${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+}
+
+// TIMER
+setInterval(() => {
+  if (running && time > 0) {
+    time--;
+    updateDisplay();
+
+    if (time === 0) {
+      running = false;
+
+      // Move to next quarter automatically
+      if (period < 4) {
+        period++;
+        time = 360;
+        updateDisplay();
+      }
+    }
+  }
+}, 1000);
+
+// KEYBOARD CONTROLS
+document.addEventListener("keydown", (e) => {
+
+  switch(e.key.toLowerCase()) {
+
+    // HOME
+    case "a": home += 1; break;
+    case "s": home += 2; break;
+    case "d": home += 3; break;
+
+    // GUEST
+    case "j": guest += 1; break;
+    case "k": guest += 2; break;
+    case "l": guest += 3; break;
+
+    // BONUS / FOULS
+    case "q": homeBonus++; break;
+    case "u": guestBonus++; break;
+
+    // TIMER
+    case " ": running = !running; break;
+
+    // RESET TIMER
+    case "r":
+      time = 360;
+      running = false;
+      break;
+
+    // NEXT PERIOD (manual override)
+    case "p":
+      if (period < 4) {
+        period++;
+        time = 360;
+      }
+      break;
+  }
+
+  updateDisplay();
+});
+
+// INIT
+updateDisplay();
+</script>
+
 </body>
 </html>
