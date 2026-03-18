@@ -1,13 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Basketball Scoreboard</title>
-
 <style>
 body {
   margin: 0;
-  background: #0b2f7a;
+  background: #0b2f7a; /* dark blue background */
   font-family: Arial, sans-serif;
   color: white;
 }
@@ -24,28 +18,38 @@ body {
 .team {
   font-size: 60px;
   font-weight: bold;
+  letter-spacing: 2px; /* more blocky letters */
 }
 
 .score {
   font-size: 140px;
-  color: red;
+  color: #66ccff; /* light blue */
   font-family: "Courier New", monospace;
-  letter-spacing: 10px;
+  letter-spacing: 0; /* remove wide spacing for squared look */
+  border: 4px solid #66ccff; /* gives a squared/box style */
+  border-radius: 8px; /* slight rounding but still blocky */
+  padding: 10px 20px;
+  display: inline-block;
 }
 
 .timer {
   font-size: 120px;
-  color: orange;
+  color: #66ccff; /* light blue for consistency */
   font-family: "Courier New", monospace;
+  border: 4px solid #66ccff;
+  border-radius: 8px;
+  padding: 10px 20px;
+  display: inline-block;
 }
 
 .period {
   font-size: 60px;
-  color: orange;
+  color: #66ccff;
 }
 
 .bonus {
   font-size: 30px;
+  color: white;
 }
 
 .center {
@@ -60,124 +64,3 @@ body {
   grid-column: 3;
 }
 </style>
-</head>
-
-<body>
-
-<div class="scoreboard">
-
-  <!-- HOME -->
-  <div class="left">
-    <div class="team">HOME</div>
-    <div id="homeScore" class="score">00</div>
-    <div class="bonus">BONUS: <span id="homeBonus">0</span></div>
-  </div>
-
-  <!-- CENTER -->
-  <div class="center">
-    <div id="timer" class="timer">06:00</div>
-    <div>PERIOD</div>
-    <div id="period" class="period">1</div>
-  </div>
-
-  <!-- GUEST -->
-  <div class="right">
-    <div class="team">GUEST</div>
-    <div id="guestScore" class="score">00</div>
-    <div class="bonus">BONUS: <span id="guestBonus">0</span></div>
-  </div>
-
-</div>
-
-<script>
-// STATE
-let home = 0;
-let guest = 0;
-let homeBonus = 0;
-let guestBonus = 0;
-
-let period = 1;
-let time = 360; // 6 minutes (in seconds)
-let running = false;
-
-// DISPLAY UPDATE
-function updateDisplay() {
-  document.getElementById("homeScore").textContent = String(home).padStart(2, "0");
-  document.getElementById("guestScore").textContent = String(guest).padStart(2, "0");
-
-  document.getElementById("homeBonus").textContent = homeBonus;
-  document.getElementById("guestBonus").textContent = guestBonus;
-
-  document.getElementById("period").textContent = period;
-
-  let minutes = Math.floor(time / 60);
-  let seconds = time % 60;
-  document.getElementById("timer").textContent =
-    `${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
-}
-
-// TIMER
-setInterval(() => {
-  if (running && time > 0) {
-    time--;
-    updateDisplay();
-
-    if (time === 0) {
-      running = false;
-
-      // Move to next quarter automatically
-      if (period < 4) {
-        period++;
-        time = 360;
-        updateDisplay();
-      }
-    }
-  }
-}, 1000);
-
-// KEYBOARD CONTROLS
-document.addEventListener("keydown", (e) => {
-
-  switch(e.key.toLowerCase()) {
-
-    // HOME
-    case "a": home += 1; break;
-    case "s": home += 2; break;
-    case "d": home += 3; break;
-
-    // GUEST
-    case "j": guest += 1; break;
-    case "k": guest += 2; break;
-    case "l": guest += 3; break;
-
-    // BONUS / FOULS
-    case "q": homeBonus++; break;
-    case "u": guestBonus++; break;
-
-    // TIMER
-    case " ": running = !running; break;
-
-    // RESET TIMER
-    case "r":
-      time = 360;
-      running = false;
-      break;
-
-    // NEXT PERIOD (manual override)
-    case "p":
-      if (period < 4) {
-        period++;
-        time = 360;
-      }
-      break;
-  }
-
-  updateDisplay();
-});
-
-// INIT
-updateDisplay();
-</script>
-
-</body>
-</html>
