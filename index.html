@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Basketball Scoreboard</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+    }
+    .scoreboard {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 50px;
+    }
+    .team {
+      font-size: 40px;
+    }
+    .score {
+      font-size: 80px;
+    }
+    .timer {
+      font-size: 100px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Basketball Scoreboard</h1>
+
+<div class="scoreboard">
+  <div class="team">
+    <h2>TEAM A</h2>
+    <div class="score" id="scoreA">0</div>
+    <div>Fouls: <span id="foulsA">0</span></div>
+  </div>
+
+  <div class="team">
+    <h2>TEAM B</h2>
+    <div class="score" id="scoreB">0</div>
+    <div>Fouls: <span id="foulsB">0</span></div>
+  </div>
+</div>
+
+<div class="timer" id="timer">10:00</div>
+
+<script>
+let scoreA = 0;
+let scoreB = 0;
+let foulsA = 0;
+let foulsB = 0;
+
+let time = 600; // 10 minutes
+let running = false;
+
+function updateDisplay() {
+  document.getElementById("scoreA").textContent = scoreA;
+  document.getElementById("scoreB").textContent = scoreB;
+  document.getElementById("foulsA").textContent = foulsA;
+  document.getElementById("foulsB").textContent = foulsB;
+
+  let minutes = Math.floor(time / 60);
+  let seconds = time % 60;
+  document.getElementById("timer").textContent =
+    minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+}
+
+setInterval(() => {
+  if (running && time > 0) {
+    time--;
+    updateDisplay();
+  }
+}, 1000);
+
+document.addEventListener("keydown", (e) => {
+  switch (e.key.toLowerCase()) {
+
+    // TEAM A
+    case "q": scoreA += 1; break;
+    case "w": scoreA += 2; break;
+    case "e": foulsA += 1; break;
+
+    // TEAM B
+    case "o": scoreB += 1; break;
+    case "p": scoreB += 2; break;
+    case "[": foulsB += 1; break;
+
+    // TIMER
+    case " ": running = !running; break;
+    case "r": time = 600; break;
+  }
+
+  updateDisplay();
+});
+
+updateDisplay();
+</script>
+
+</body>
+</html>
