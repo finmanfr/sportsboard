@@ -21,7 +21,8 @@ body {
     background: radial-gradient(circle, #2b2b2b 60%, #1a1a1a);
     border-radius: 50%;
     box-shadow: 0 0 30px black;
-    padding: 20px;
+    border: 6px solid #555; /* 🔥 OUTLINE */
+    padding: 25px;
     position: relative;
 }
 
@@ -36,15 +37,20 @@ body {
 
 .timer {
     font-family: 'scoreboard';
-    font-size: 40px;
+    font-size: 42px;
     color: red;
     text-align: center;
-    margin-bottom: 10px;
+    position: absolute;
+    top: 70px;
+    width: 100%;
 }
 
 .middle {
+    position: absolute;
+    top: 140px;
+    width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
 }
 
@@ -115,6 +121,7 @@ body {
 <!-- AUDIO -->
 <audio id="threeSound" src="three.mp3"></audio>
 <audio id="crowdSound" src="crowd.mp3"></audio>
+<audio id="nbaMusic" src="nba-music.mp3"></audio>
 
 <script>
 let home = 0;
@@ -152,12 +159,36 @@ function playSounds(points) {
     const crowd = document.getElementById("crowdSound");
     const three = document.getElementById("threeSound");
 
-    if (crowd) crowd.play();
+    if (crowd) {
+        crowd.volume = 0.3; // 🔉 quieter crowd
+        crowd.currentTime = 0;
+        crowd.play();
+    }
 
     if (points === 3 && three) {
+        three.volume = 1.0;
+        three.currentTime = 0;
         three.play();
     }
 }
+
+    function playRandomMusic() {
+    const music = document.getElementById("nbaMusic");
+
+    if (!music) return;
+
+    music.volume = 0.4;
+
+    music.currentTime = 0;
+    music.play();
+
+    // play again randomly every 10–25 seconds
+    const next = Math.random() * 15000 + 10000;
+    setTimeout(playRandomMusic, next);
+}
+
+// start it
+playRandomMusic();
 
 /* TIMER */
 setInterval(() => {
