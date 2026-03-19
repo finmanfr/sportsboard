@@ -5,90 +5,100 @@
 <title>Scoreboard</title>
 
 <style>
-    body {
-        margin: 0;
-        background: #1a1a1a;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        font-family: Arial, sans-serif;
-    }
+body {
+    margin: 0;
+    background: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
-    .board {
-        background: #2b2b2b;
-        padding: 15px 20px;
-        border-radius: 12px;
-        box-shadow: 0 0 20px black;
-        width: 420px;
-    }
+/* CIRCULAR BOARD */
+.board {
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, #2b2b2b 60%, #1a1a1a);
+    border-radius: 50%;
+    box-shadow: 0 0 30px black;
+    padding: 20px;
+    position: relative;
+}
 
-    .top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-        color: white;
-        font-weight: bold;
-    }
+/* TEXT */
+.top {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
 
-    .timer {
-        font-family: 'scoreboard';
-        font-size: 42px;
-        color: red;
-        background: #111;
-        padding: 5px 12px;
-        border-radius: 6px;
-    }
+.timer {
+    font-family: 'scoreboard';
+    font-size: 40px;
+    color: red;
+    text-align: center;
+    margin-bottom: 10px;
+}
 
-    .middle {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+.middle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    .score {
-        font-family: 'scoreboard';
-        font-size: 70px;
-        color: red;
-        background: #111;
-        padding: 10px 18px;
-        border-radius: 8px;
-        width: 120px;
-        text-align: center;
-    }
+.score {
+    font-family: 'scoreboard';
+    font-size: 70px;
+    color: red;
+    text-align: center;
+    width: 120px;
+}
 
-    .center {
-        text-align: center;
-        color: white;
-        font-size: 14px;
-    }
+.center {
+    text-align: center;
+    color: white;
+}
 
-    .period {
-        font-family: 'scoreboard';
-        font-size: 32px;
-        color: red;
-        background: #111;
-        padding: 4px 10px;
-        border-radius: 6px;
-        margin-top: 4px;
-    }
+.period {
+    font-family: 'scoreboard';
+    font-size: 30px;
+    color: red;
+}
 
-    @font-face {
-        font-family: 'scoreboard';
-        src: url('scoreboard.ttf');
-    }
+/* POPUP ANIMATION */
+.popup {
+    position: absolute;
+    font-family: 'scoreboard';
+    color: lime;
+    font-size: 20px;
+    opacity: 1;
+    transform: scale(1);
+    animation: pop 1s forwards;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+@font-face {
+    font-family: 'scoreboard';
+    src: url('scoreboard.ttf');
+}
 </style>
 </head>
 
 <body>
 
-<div class="board">
+<div class="board" id="board">
     <div class="top">
         <div>HOME</div>
-        <div class="timer" id="timer">6:00</div>
         <div>GUEST</div>
     </div>
+
+    <div class="timer" id="timer">6:00</div>
 
     <div class="middle">
         <div class="score" id="homeScore">0</div>
@@ -102,12 +112,16 @@
     </div>
 </div>
 
+<!-- AUDIO -->
+<audio id="threeSound" src="three.mp3"></audio>
+<audio id="crowdSound" src="crowd.mp3"></audio>
+
 <script>
 let home = 0;
 let away = 0;
-
-let time = 360; // 6:00 in seconds
+let time = 360;
 let running = false;
+let lastArrow = null;
 
 function updateDisplay() {
     document.getElementById("homeScore").textContent = home;
@@ -119,54 +133,70 @@ function updateDisplay() {
         min + ":" + (sec < 10 ? "0" + sec : sec);
 }
 
-// TIMER LOOP
+/* POPUP EFFECT */
+function showPopup(text, side) {
+    const popup = document.createElement("div");
+    popup.className = "popup";
+    popup.textContent = "+" + text;
+
+    popup.style.left = side === "home" ? "60px" : "280px";
+    popup.style.top = "200px";
+
+    document.getElementById("board").appendChild(popup);
+
+    setTimeout(() => popup.remove(), 1000);
+}
+
+/* SOUND */
+function playSounds(points) {
+    const crowd = document.getElementById("crowdSound");
+    const three = document.getElementById("threeSound");
+
+    if (crowd) crowd.play();
+
+    if (points === 3 && three) {
+        three.play();
+    }
+}
+
+/* TIMER */
 setInterval(() => {
     if (running) {
         if (time > 0) {
             time--;
-        } else {
-            // when time hits 0
-            running = false;
-
-            let periodEl = document.getElementById("period");
-            let current = Number(periodEl.textContent);
-
-            if (current < 4) {
-                periodEl.textContent = current + 1;
-                time = 360; // reset to 6:00
-            }
         }
-
         updateDisplay();
     }
 }, 1000);
 
-// KEY CONTROLS
+/* CONTROLS */
 document.addEventListener("keydown", (e) => {
 
-    // SPACE = pause/play
     if (e.code === "Space") {
         running = !running;
     }
 
-    // LEFT ARROW + NUMBER = HOME
-    if (e.key >= "0" && e.key <= "9" && lastArrow === "left") {
-        home += Number(e.key);
+    if (e.key >= "0" && e.key <= "9") {
+        let points = Number(e.key);
+
+        if (lastArrow === "left") {
+            home += points;
+            showPopup(points, "home");
+            playSounds(points);
+        }
+
+        if (lastArrow === "right") {
+            away += points;
+            showPopup(points, "away");
+            playSounds(points);
+        }
+
         updateDisplay();
     }
 
-    // RIGHT ARROW + NUMBER = AWAY
-    if (e.key >= "0" && e.key <= "9" && lastArrow === "right") {
-        away += Number(e.key);
-        updateDisplay();
-    }
-
-    // track last arrow
     if (e.code === "ArrowLeft") lastArrow = "left";
     if (e.code === "ArrowRight") lastArrow = "right";
 });
-
-let lastArrow = null;
 
 updateDisplay();
 </script>
