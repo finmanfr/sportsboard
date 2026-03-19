@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scoreboard</title>
+
+<style>
+    body {
+        margin: 0;
+        background: #1a1a1a;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+    }
+
+    .board {
+        background: #2b2b2b;
+        padding: 15px 20px;
+        border-radius: 12px;
+        box-shadow: 0 0 20px black;
+        width: 420px;
+    }
+
+    .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .timer {
+        font-family: 'scoreboard';
+        font-size: 42px;
+        color: red;
+        background: #111;
+        padding: 5px 12px;
+        border-radius: 6px;
+    }
+
+    .middle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .score {
+        font-family: 'scoreboard';
+        font-size: 70px;
+        color: red;
+        background: #111;
+        padding: 10px 18px;
+        border-radius: 8px;
+        width: 120px;
+        text-align: center;
+    }
+
+    .center {
+        text-align: center;
+        color: white;
+        font-size: 14px;
+    }
+
+    .period {
+        font-family: 'scoreboard';
+        font-size: 32px;
+        color: red;
+        background: #111;
+        padding: 4px 10px;
+        border-radius: 6px;
+        margin-top: 4px;
+    }
+
+    @font-face {
+        font-family: 'scoreboard';
+        src: url('scoreboard.ttf');
+    }
+</style>
+</head>
+
+<body>
+
+<div class="board">
+    <div class="top">
+        <div>HOME</div>
+        <div class="timer" id="timer">6:00</div>
+        <div>GUEST</div>
+    </div>
+
+    <div class="middle">
+        <div class="score" id="homeScore">0</div>
+
+        <div class="center">
+            PERIOD
+            <div class="period" id="period">1</div>
+        </div>
+
+        <div class="score" id="awayScore">0</div>
+    </div>
+</div>
+
+<script>
+let home = 0;
+let away = 0;
+
+let time = 360; // 6:00 in seconds
+let running = false;
+
+function updateDisplay() {
+    document.getElementById("homeScore").textContent = home;
+    document.getElementById("awayScore").textContent = away;
+
+    let min = Math.floor(time / 60);
+    let sec = time % 60;
+    document.getElementById("timer").textContent =
+        min + ":" + (sec < 10 ? "0" + sec : sec);
+}
+
+// TIMER LOOP
+setInterval(() => {
+    if (running && time > 0) {
+        time--;
+        updateDisplay();
+    }
+}, 1000);
+
+// KEY CONTROLS
+document.addEventListener("keydown", (e) => {
+
+    // SPACE = pause/play
+    if (e.code === "Space") {
+        running = !running;
+    }
+
+    // LEFT ARROW + NUMBER = HOME
+    if (e.key >= "0" && e.key <= "9" && lastArrow === "left") {
+        home += Number(e.key);
+        updateDisplay();
+    }
+
+    // RIGHT ARROW + NUMBER = AWAY
+    if (e.key >= "0" && e.key <= "9" && lastArrow === "right") {
+        away += Number(e.key);
+        updateDisplay();
+    }
+
+    // track last arrow
+    if (e.code === "ArrowLeft") lastArrow = "left";
+    if (e.code === "ArrowRight") lastArrow = "right";
+});
+
+let lastArrow = null;
+
+updateDisplay();
+</script>
+
+</body>
+</html>
