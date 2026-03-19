@@ -23,7 +23,10 @@ body {
     border-radius: 50%;
     border: 6px solid #555;
     background: #111;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* FONT */
@@ -38,59 +41,43 @@ body {
     font-size: 12px;
     color: #aaa;
     letter-spacing: 2px;
-}
-
-/* HOME */
-.topScore {
-    position: absolute;
-    top: 50px;
-    width: 100%;
-    text-align: center;
-}
-
-/* GUEST */
-.bottomScore {
-    position: absolute;
-    bottom: 150px;
-    width: 100%;
-    text-align: center;
+    margin-top: 10px;
 }
 
 /* SCORES */
+.score {
+    text-align: center;
+}
+
 .scoreNum {
     font-family: 'scoreboard';
-    font-size: 80px;
+    font-size: 70px;
     color: red;
 }
 
+/* DIVIDER */
+.divider {
+    width: 60%;
+    height: 2px;
+    background: #555;
+    margin: 10px 0;
+}
+
 /* PERIOD */
-
-
-/* TIMER */
-.timer {
-    position: absolute;
-    bottom: 40px;
-    width: 100%;
-    text-align: center;
-    font-family: 'scoreboard';
-    font-size: 50px;
-    color: orange;
-}
-
-.quarterBox {
-    position: absolute;
-    top: 190px;
-    width: 100%;
-    text-align: center;
-}
-
 #period {
     font-family: 'scoreboard';
     font-size: 28px;
     color: red;
 }
 
-/* FLASH UNDER 10 */
+/* TIMER */
+.timer {
+    font-family: 'scoreboard';
+    font-size: 50px;
+    color: orange;
+}
+
+/* FLASH */
 .flash {
     animation: flash 0.5s infinite;
 }
@@ -121,23 +108,27 @@ body {
 
 <div class="board" id="board">
 
-    <div class="topScore">
+    <!-- HOME -->
+    <div class="score">
         <div class="label">HOME</div>
         <div class="scoreNum" id="homeScore">0</div>
     </div>
 
-    <div class="bottomScore">
+    <!-- GUEST -->
+    <div class="score">
         <div class="label">GUEST</div>
         <div class="scoreNum" id="awayScore">0</div>
     </div>
 
-  
+    <!-- LINE -->
+    <div class="divider"></div>
 
+    <!-- PERIOD -->
+    <div class="label">PERIOD</div>
+    <div id="period">1</div>
+
+    <!-- TIME -->
     <div class="timer" id="timer">6:00</div>
-      <div class="quarterBox">
-        <div class="label">PERIOD</div>
-        <div id="period">1</div>
-    </div>
 
 </div>
 
@@ -163,10 +154,8 @@ function updateDisplay() {
     let sec = time % 60;
 
     let timerEl = document.getElementById("timer");
-
     timerEl.textContent = min + ":" + (sec < 10 ? "0" + sec : sec);
 
-    // FLASH UNDER 10
     if (time <= 10 && time > 0) {
         timerEl.classList.add("flash");
     } else {
@@ -180,11 +169,10 @@ function showPopup(points, side) {
     popup.className = "popup";
     popup.textContent = "+" + points;
 
-    popup.style.left = "160px";
-    popup.style.top = side === "home" ? "110px" : "260px";
+    popup.style.left = "180px";
+    popup.style.top = side === "home" ? "120px" : "200px";
 
     document.getElementById("board").appendChild(popup);
-
     setTimeout(() => popup.remove(), 1000);
 }
 
@@ -206,7 +194,7 @@ function playSounds(points) {
     }
 }
 
-/* RANDOM NBA MUSIC */
+/* MUSIC LOOP */
 function musicLoop() {
     const music = document.getElementById("nbaMusic");
     if (!music) return;
@@ -227,7 +215,6 @@ setInterval(() => {
             time--;
         } else {
             running = false;
-
             document.getElementById("buzzerSound").play();
 
             let periodEl = document.getElementById("period");
@@ -242,7 +229,7 @@ setInterval(() => {
     updateDisplay();
 }, 1000);
 
-/* INPUT */
+/* CONTROLS */
 document.addEventListener("keydown", (e) => {
 
     if (e.code === "Space") {
