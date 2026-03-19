@@ -24,9 +24,15 @@ body {
     background: #111;
 }
 
-/* FONTS */
+/* FONT */
+@font-face {
+    font-family: 'scoreboard';
+    src: url('scoreboard.ttf');
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
 
+/* LABELS */
 .label {
     font-family: 'Orbitron', sans-serif;
     font-size: 12px;
@@ -67,6 +73,20 @@ body {
     font-size: 50px;
     color: orange;
 }
+
+/* POPUP */
+.popup {
+    position: absolute;
+    font-family: 'scoreboard';
+    color: lime;
+    font-size: 20px;
+    animation: pop 1s forwards;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
 </style>
 </head>
 
@@ -87,6 +107,115 @@ body {
     <div class="timer" id="timer">6:00</div>
 
 </div>
+
+<!-- SOUNDS -->
+<audio id="threeSound" src="three.mp3"></audio>
+<audio id="crowdSound" src="crowd.mp3"></audio>
+<audio id="nbaMusic" src="nba-music.mp3"></audio>
+
+<script>
+let home = 0;
+let away = 0;
+let time = 360;
+let running = false;
+let lastSide = "home";
+
+/* DISPLAY */
+function updateDisplay() {
+    document.getElementById("homeScore").textContent = home;
+    document.getElementById("awayScore").textContent = away;
+
+    let min = Math.floor(time / 60);
+    let sec = time % 60;
+
+    document.getElementById("timer").textContent =
+        min + ":" + (sec < 10 ? "0" + sec : sec);
+}
+
+/* POPUP */
+function showPopup(points, side) {
+    const popup = document.createElement("div");
+    popup.className = "popup";
+    popup.textContent = "+" + points;
+
+    popup.style.left = side === "home" ? "150px" : "150px";
+    popup.style.top = side === "home" ? "120px" : "260px";
+
+    document.getElementById("board").appendChild(popup);
+
+    setTimeout(() => popup.remove(), 1000);
+}
+
+/* SOUND */
+function playSounds(points) {
+    const crowd = document.getElementById("crowdSound");
+    const three = document.getElementById("threeSound");
+
+    if (crowd) {
+        crowd.volume = 0.3;
+        crowd.currentTime = 0;
+        crowd.play();
+    }
+
+    if (points === 3 && three) {
+        three.volume = 1.0;
+        three.currentTime = 0;
+        three.play();
+    }
+}
+
+/* NBA MUSIC RANDOM */
+function playMusicLoop() {
+    const music = document.getElementById("nbaMusic");
+    if (!music) return;
+
+    music.volume = 0.4;
+    music.currentTime = 0;
+    music.play();
+
+    let next = Math.random() * 15000 + 10000;
+    setTimeout(playMusicLoop, next);
+}
+playMusicLoop();
+
+/* TIMER */
+setInterval(() => {
+    if (running) {
+        if (time > 0) {
+            time--;
+        }
+    }
+    updateDisplay();
+}, 1000);
+
+/* INPUT */
+document.addEventListener("keydown", (e) => {
+
+    if (e.code === "Space") {
+        running = !running;
+    }
+
+    if (e.key >= "0" && e.key <= "9") {
+        let points = Number(e.key);
+
+        if (lastSide === "home") {
+            home += points;
+            showPopup(points, "home");
+        } else {
+            away += points;
+            showPopup(points, "away");
+        }
+
+        playSounds(points);
+        updateDisplay();
+    }
+
+    if (e.code === "ArrowLeft") lastSide = "home";
+    if (e.code === "ArrowRight") lastSide = "away";
+});
+
+updateDisplay();
+</script>
 
 </body>
 </html>
