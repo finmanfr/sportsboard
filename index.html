@@ -14,25 +14,17 @@ body {
     height: 100vh;
 }
 
-/* CIRCULAR BOARD */
-<div class="board" id="board">
+/* BOARD */
+.board {
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    border: 6px solid #555;
+    position: relative;
+    background: #111;
+}
 
-    <div class="score topScore">
-        <div class="label">HOME</div>
-        <div id="homeScore">0</div>
-    </div>
-
-    <div class="score bottomScore">
-        <div class="label">GUEST</div>
-        <div id="awayScore">0</div>
-    </div>
-
-    <div class="timer" id="timer">6:00</div>
-
-</div>
-
-/* TEXT */
-/* MODERN LABEL FONT */
+/* FONTS */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
 
 .label {
@@ -40,61 +32,40 @@ body {
     font-size: 12px;
     color: #aaa;
     letter-spacing: 2px;
-    margin-bottom: 5px;
 }
 
-/* SCORE POSITIONS */
+/* HOME */
 .topScore {
     position: absolute;
-    top: 40px;
+    top: 60px;
     width: 100%;
     text-align: center;
 }
 
+/* GUEST */
 .bottomScore {
     position: absolute;
-    bottom: 120px;
+    bottom: 140px;
     width: 100%;
     text-align: center;
 }
 
-/* BIG SCORES */
-.score div:last-child {
+/* SCORES */
+.scoreNum {
     font-family: 'scoreboard';
     font-size: 80px;
     color: red;
 }
 
-/* TIMER (MAIN FOCUS) */
+/* TIMER */
 .timer {
     position: absolute;
     bottom: 40px;
     width: 100%;
     text-align: center;
     font-family: 'scoreboard';
-    font-size: 55px;
+    font-size: 50px;
     color: orange;
-}
-
-/* POPUP ANIMATION */
-.popup {
-    position: absolute;
-    font-family: 'scoreboard';
-    color: lime;
-    font-size: 20px;
-    opacity: 1;
-    transform: scale(1);
-    animation: pop 1s forwards;
-}
-
-@keyframes pop {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(2.5); opacity: 0; }
-}
-
-@font-face {
-    font-family: 'scoreboard';
-    src: url('scoreboard.ttf');
 }
 </style>
 </head>
@@ -102,138 +73,20 @@ body {
 <body>
 
 <div class="board" id="board">
-    <div class="top">
-        <div>HOME</div>
-        <div>GUEST</div>
+
+    <div class="topScore">
+        <div class="label">HOME</div>
+        <div class="scoreNum" id="homeScore">0</div>
+    </div>
+
+    <div class="bottomScore">
+        <div class="label">GUEST</div>
+        <div class="scoreNum" id="awayScore">0</div>
     </div>
 
     <div class="timer" id="timer">6:00</div>
 
-    <div class="middle">
-        <div class="score" id="homeScore">0</div>
-
-        <div class="center">
-            PERIOD
-            <div class="period" id="period">1</div>
-        </div>
-
-        <div class="score" id="awayScore">0</div>
-    </div>
 </div>
-
-<!-- AUDIO -->
-<audio id="threeSound" src="three.mp3"></audio>
-<audio id="crowdSound" src="crowd.mp3"></audio>
-<audio id="nbaMusic" src="nba-music.mp3"></audio>
-
-<script>
-let home = 0;
-let away = 0;
-let time = 360;
-let running = false;
-let lastArrow = null;
-
-function updateDisplay() {
-    document.getElementById("homeScore").textContent = home;
-    document.getElementById("awayScore").textContent = away;
-
-    let min = Math.floor(time / 60);
-    let sec = time % 60;
-    document.getElementById("timer").textContent =
-        min + ":" + (sec < 10 ? "0" + sec : sec);
-}
-
-/* POPUP EFFECT */
-function showPopup(text, side) {
-    const popup = document.createElement("div");
-    popup.className = "popup";
-    popup.textContent = "+" + text;
-
-    popup.style.left = side === "home" ? "60px" : "280px";
-    popup.style.top = "200px";
-
-    document.getElementById("board").appendChild(popup);
-
-    setTimeout(() => popup.remove(), 1000);
-}
-
-/* SOUND */
-function playSounds(points) {
-    const crowd = document.getElementById("crowdSound");
-    const three = document.getElementById("threeSound");
-
-    if (crowd) {
-        crowd.volume = 0.3; // 🔉 quieter crowd
-        crowd.currentTime = 0;
-        crowd.play();
-    }
-
-    if (points === 3 && three) {
-        three.volume = 1.0;
-        three.currentTime = 0;
-        three.play();
-    }
-}
-
-    function playRandomMusic() {
-    const music = document.getElementById("nbaMusic");
-
-    if (!music) return;
-
-    music.volume = 0.4;
-
-    music.currentTime = 0;
-    music.play();
-
-    // play again randomly every 10–25 seconds
-    const next = Math.random() * 15000 + 10000;
-    setTimeout(playRandomMusic, next);
-}
-
-// start it
-playRandomMusic();
-
-/* TIMER */
-setInterval(() => {
-    if (running) {
-        if (time > 0) {
-            time--;
-        }
-        updateDisplay();
-    }
-}, 1000);
-
-/* CONTROLS */
-document.addEventListener("keydown", (e) => {
-
-    if (e.code === "Space") {
-        running = !running;
-    }
-
-    if (e.key >= "0" && e.key <= "9") {
-        let points = Number(e.key);
-
-        if (lastArrow === "left") {
-            home += points;
-            showPopup(points, "home");
-            playSounds(points);
-        }
-
-        if (lastArrow === "right") {
-            away += points;
-            showPopup(points, "away");
-            playSounds(points);
-        }
-
-        updateDisplay();
-    }
-
-    if (e.code === "ArrowLeft") lastArrow = "left";
-    if (e.code === "ArrowRight") lastArrow = "right";
-});
-
-updateDisplay();
-</script>
 
 </body>
 </html>
