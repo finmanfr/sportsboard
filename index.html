@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>Scoreboard</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+
 <style>
 body {
     margin: 0;
@@ -20,8 +22,8 @@ body {
     height: 420px;
     border-radius: 50%;
     border: 6px solid #555;
-    position: relative;
     background: #111;
+    position: relative;
 }
 
 /* FONT */
@@ -29,8 +31,6 @@ body {
     font-family: 'scoreboard';
     src: url('scoreboard.ttf');
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
 
 /* LABELS */
 .label {
@@ -43,7 +43,7 @@ body {
 /* HOME */
 .topScore {
     position: absolute;
-    top: 60px;
+    top: 50px;
     width: 100%;
     text-align: center;
 }
@@ -51,7 +51,7 @@ body {
 /* GUEST */
 .bottomScore {
     position: absolute;
-    bottom: 140px;
+    bottom: 150px;
     width: 100%;
     text-align: center;
 }
@@ -60,6 +60,20 @@ body {
 .scoreNum {
     font-family: 'scoreboard';
     font-size: 80px;
+    color: red;
+}
+
+/* PERIOD */
+.quarterBox {
+    position: absolute;
+    top: 190px;
+    width: 100%;
+    text-align: center;
+}
+
+#period {
+    font-family: 'scoreboard';
+    font-size: 28px;
     color: red;
 }
 
@@ -72,6 +86,17 @@ body {
     font-family: 'scoreboard';
     font-size: 50px;
     color: orange;
+}
+
+/* FLASH UNDER 10 */
+.flash {
+    animation: flash 0.5s infinite;
+}
+
+@keyframes flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
 }
 
 /* POPUP */
@@ -104,13 +129,19 @@ body {
         <div class="scoreNum" id="awayScore">0</div>
     </div>
 
+    <div class="quarterBox">
+        <div class="label">PERIOD</div>
+        <div id="period">1</div>
+    </div>
+
     <div class="timer" id="timer">6:00</div>
 
 </div>
 
-<!-- SOUNDS -->
+<!-- AUDIO -->
 <audio id="threeSound" src="three.mp3"></audio>
 <audio id="crowdSound" src="crowd.mp3"></audio>
+<audio id="buzzerSound" src="buzzer.mp3"></audio>
 <audio id="nbaMusic" src="nba-music.mp3"></audio>
 
 <script>
@@ -128,8 +159,16 @@ function updateDisplay() {
     let min = Math.floor(time / 60);
     let sec = time % 60;
 
-    document.getElementById("timer").textContent =
-        min + ":" + (sec < 10 ? "0" + sec : sec);
+    let timerEl = document.getElementById("timer");
+
+    timerEl.textContent = min + ":" + (sec < 10 ? "0" + sec : sec);
+
+    // FLASH UNDER 10
+    if (time <= 10 && time > 0) {
+        timerEl.classList.add("flash");
+    } else {
+        timerEl.classList.remove("flash");
+    }
 }
 
 /* POPUP */
@@ -138,8 +177,8 @@ function showPopup(points, side) {
     popup.className = "popup";
     popup.textContent = "+" + points;
 
-    popup.style.left = side === "home" ? "150px" : "150px";
-    popup.style.top = side === "home" ? "120px" : "260px";
+    popup.style.left = "160px";
+    popup.style.top = side === "home" ? "110px" : "260px";
 
     document.getElementById("board").appendChild(popup);
 
@@ -158,14 +197,14 @@ function playSounds(points) {
     }
 
     if (points === 3 && three) {
-        three.volume = 1.0;
+        three.volume = 1;
         three.currentTime = 0;
         three.play();
     }
 }
 
-/* NBA MUSIC RANDOM */
-function playMusicLoop() {
+/* RANDOM NBA MUSIC */
+function musicLoop() {
     const music = document.getElementById("nbaMusic");
     if (!music) return;
 
@@ -173,16 +212,28 @@ function playMusicLoop() {
     music.currentTime = 0;
     music.play();
 
-    let next = Math.random() * 15000 + 10000;
-    setTimeout(playMusicLoop, next);
+    let next = Math.random() * 15000 + 15000;
+    setTimeout(musicLoop, next);
 }
-playMusicLoop();
+musicLoop();
 
 /* TIMER */
 setInterval(() => {
     if (running) {
         if (time > 0) {
             time--;
+        } else {
+            running = false;
+
+            document.getElementById("buzzerSound").play();
+
+            let periodEl = document.getElementById("period");
+            let current = Number(periodEl.textContent);
+
+            if (current < 4) {
+                periodEl.textContent = current + 1;
+                time = 360;
+            }
         }
     }
     updateDisplay();
