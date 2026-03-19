@@ -121,8 +121,22 @@ function updateDisplay() {
 
 // TIMER LOOP
 setInterval(() => {
-    if (running && time > 0) {
-        time--;
+    if (running) {
+        if (time > 0) {
+            time--;
+        } else {
+            // when time hits 0
+            running = false;
+
+            let periodEl = document.getElementById("period");
+            let current = Number(periodEl.textContent);
+
+            if (current < 4) {
+                periodEl.textContent = current + 1;
+                time = 360; // reset to 6:00
+            }
+        }
+
         updateDisplay();
     }
 }, 1000);
