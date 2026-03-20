@@ -105,7 +105,20 @@ body {
 </head>
 
 <body>
-
+<iframe 
+  id="cameraFeed"
+  src="https://vdo.ninja/?view=JxeTTTK" 
+  style="
+    width: 100%;
+    height: 100vh;
+    border: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    display: none;
+  ">
+</iframe>
 <div class="board" id="board">
 
     <!-- HOME -->
@@ -249,6 +262,7 @@ document.addEventListener("keydown", (e) => {
 
         playSounds(points);
         updateDisplay();
+       showCameraFeed();
     }
 
     if (e.code === "ArrowLeft") lastSide = "home";
@@ -257,6 +271,18 @@ document.addEventListener("keydown", (e) => {
 
 updateDisplay();
 </script>
+<script>
+function showCameraFeed() {
+  const feed = document.getElementById("cameraFeed");
 
+  // show it
+  feed.style.display = "block";
+
+  // hide after 3 seconds
+  setTimeout(() => {
+    feed.style.display = "none";
+  }, 3000);
+}
+</script>
 </body>
 </html>
