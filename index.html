@@ -275,15 +275,21 @@ updateDisplay();
 
 <script>
 function showCameraFeed() {
-  const feed = document.getElementById("cameraFeed");
+    const feed = document.getElementById("cameraFeed");
 
-  // show it
-  feed.style.display = "block";
-
-  // hide after 3 seconds
-  setTimeout(() => {
+    // start hidden just in case
     feed.style.display = "none";
-  }, 3000);
+
+    // wait 2 seconds, then show
+    setTimeout(() => {
+        feed.style.display = "block";
+
+        // wait 5 seconds, then hide
+        setTimeout(() => {
+            feed.style.display = "none";
+        }, 5000);
+
+    }, 2000);
 }
 </script>
 
