@@ -272,6 +272,9 @@ document.addEventListener("keydown", (e) => {
 updateDisplay();
 </script>
 <script>
+</script>
+
+<script>
 function showCameraFeed() {
   const feed = document.getElementById("cameraFeed");
 
@@ -284,5 +287,55 @@ function showCameraFeed() {
   }, 3000);
 }
 </script>
+
+<!-- 🔥 ADD THIS WHOLE BLOCK BELOW -->
+<img id="overlayImage" src="" style="
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 80%;
+  display: none;
+  z-index: 999;
+">
+
+<script>
+let imageVisible = false;
+let imageURL = "";
+
+// 🔗 PUT YOUR GOOGLE SHEET CSV LINK HERE
+const sheetURL = const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcFH0v30-lrDT1f5u1ShSyRfd-ZJiUpzgZIO-nyI2V9z118fzjIBlXTau482ZPSK2Jff6qAl7aGzf_/pub?output=csv";
+
+async function fetchImage() {
+  try {
+    const res = await fetch(sheetURL);
+    const text = await res.text();
+
+    const rows = text.split("\n");
+    const cells = rows[1].split(",");
+
+    imageURL = cells[0]; // A2
+    document.getElementById("overlayImage").src = imageURL;
+
+  } catch (err) {
+    console.log("Sheet error:", err);
+  }
+}
+
+// run once
+fetchImage();
+setInterval(fetchImage, 2000); // updates every 2 seconds
+
+// press "i" to toggle image
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "i") {
+    const img = document.getElementById("overlayImage");
+
+    imageVisible = !imageVisible;
+    img.style.display = imageVisible ? "block" : "none";
+  }
+});
+</script>
+
 </body>
 </html>
