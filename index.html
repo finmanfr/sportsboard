@@ -289,11 +289,12 @@ function showCameraFeed() {
 
 <!-- IMAGE OVERLAY -->
 <img id="overlayImage" src="" style="
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 80%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
   display: none;
   z-index: 999;
 ">
