@@ -245,11 +245,16 @@ setInterval(() => {
 /* CONTROLS */
 document.addEventListener("keydown", (e) => {
 
+    pressedKeys.add(e.key.toLowerCase());
+
     if (e.code === "Space") {
         running = !running;
     }
 
-    if (e.key >= "0" && e.key <= "9") {
+    const letterHeld = [...pressedKeys].some(k => k >= "a" && k <= "z");
+
+    // ✅ ONLY add score if NO letter is being held
+    if (!letterHeld && e.key >= "0" && e.key <= "9") {
         let points = Number(e.key);
 
         if (lastSide === "home") {
@@ -262,7 +267,7 @@ document.addEventListener("keydown", (e) => {
 
         playSounds(points);
         updateDisplay();
-       showCameraFeed();
+        showCameraFeed();
     }
 
     if (e.code === "ArrowLeft") lastSide = "home";
