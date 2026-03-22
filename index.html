@@ -324,14 +324,23 @@ const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcFH0v30-lrDT
 
 async function fetchImage() {
   try {
-    const res = await fetch(sheetURL);
+    const res = await fetch(sheetURL + "&t=" + Date.now(), {
+      cache: "no-store"
+    });
+
     const text = await res.text();
 
     const rows = text.split("\n");
     const cells = rows[1].split(",");
 
-    const imageURL = cells[0];
-    document.getElementById("overlayImage").src = imageURL;
+    const imageURL = cells[0].trim();
+
+    const img = document.getElementById("overlayImage");
+
+    // ONLY update if it's actually different
+    if (img.src !== imageURL) {
+      img.src = imageURL;
+    }
 
   } catch (err) {
     console.log("Sheet error:", err);
