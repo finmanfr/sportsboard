@@ -318,45 +318,73 @@ function showCameraFeed() {
 
 <script>
 let imageVisible = false;
+let currentKey = null;
 
-// ✅ your fixed sheet link
+// sheet link
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcFH0v30-lrDT1f5u1ShSyRfd-ZJiUpzgZIO-nyI2V9z118fzjIBlXTau482ZPSK2Jff6qAl7aGzf_/pub?output=csv";
 
-async function fetchImage() {
+// store sheet data
+let sheetData = [];
+
+// fetch whole sheet
+async function fetchSheet() {
   try {
     const res = await fetch(sheetURL + "&t=" + Date.now(), {
       cache: "no-store"
     });
 
     const text = await res.text();
+    const rows = text.split("\n").map(r => r.split(","));
 
-    const rows = text.split("\n");
-    const cells = rows[1].split(",");
-
-    const imageURL = cells[0].trim();
-
-    const img = document.getElementById("overlayImage");
-
-    // ONLY update if it's actually different
-    if (img.src !== imageURL) {
-      img.src = imageURL;
-    }
+    sheetData = rows;
 
   } catch (err) {
     console.log("Sheet error:", err);
   }
 }
 
-// load + auto refresh
-fetchImage();
-setInterval(fetchImage, 2000);
+// load + refresh
+fetchSheet();
+setInterval(fetchSheet, 2000);
 
-// press I to toggle
+// key tracking
+let pressedKeys = new Set();
+
+document.addEventListener("keydown", (e) => {
+  pressedKeys.add(e.key.toLowerCase());
+
+  const letter = [...pressedKeys].find(k => k >= "a" && k <= "z");
+  const number = [...pressedKeys].find(k => k >= "1" && k <= "9");
+
+  if (letter && number) {
+    const col = letter.charCodeAt(0) - 97; // a=0
+    const row = Number(number) - 1; // 1=0
+
+    if (sheetData[row] && sheetData[row][col]) {
+      const imageURL = sheetData[row][col].trim();
+      const img = document.getElementById("overlayImage");
+
+      if (img.src !== imageURL) {
+        img.src = imageURL;
+      }
+
+      img.style.display = "block";
+      imageVisible = true;
+    }
+  }
+});
+
+// remove keys when released
+document.addEventListener("keyup", (e) => {
+  pressedKeys.delete(e.key.toLowerCase());
+});
+
+// optional: press "i" to hide
 document.addEventListener("keydown", (e) => {
   if (e.key.toLowerCase() === "i") {
     const img = document.getElementById("overlayImage");
-    imageVisible = !imageVisible;
-    img.style.display = imageVisible ? "block" : "none";
+    imageVisible = false;
+    img.style.display = "none";
   }
 });
 </script>
