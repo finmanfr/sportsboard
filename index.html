@@ -394,5 +394,29 @@ document.addEventListener("keydown", (e) => {
 });
 </script>
 
+    <script>
+let cameraActive = false;
+
+const cameraFrame = document.getElementById("cameraFrame"); // your iframe
+const scoreboard = document.getElementById("scoreboard");   // your main board (optional)
+
+// start hidden
+cameraFrame.style.display = "none";
+
+document.addEventListener("keydown", (e) => {
+  if (e.shiftKey && e.key.toLowerCase() === "c") {
+    cameraActive = !cameraActive;
+
+    if (cameraActive) {
+      cameraFrame.style.display = "block";
+      if (scoreboard) scoreboard.style.display = "none";
+    } else {
+      cameraFrame.style.display = "none";
+      if (scoreboard) scoreboard.style.display = "flex";
+    }
+  }
+});
+</script>
+
 </body>
 </html>
